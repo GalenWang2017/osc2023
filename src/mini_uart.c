@@ -31,7 +31,6 @@ void uart_send_string(char* str)
  * Display a binary value in hexadecimal
  */
 void uart_hex(unsigned int d) {
-	uart_send_string("0x");
     unsigned int n;
     int c;
     for(c=28;c>=0;c-=4) {
@@ -44,14 +43,17 @@ void uart_hex(unsigned int d) {
 }
 
 void uart_dec(unsigned int d){
-	char dec[9];
-	int i;
-	for(i = 0; i < 8; i++){
-		dec[i] = 48;
-	}
-	dec[8] = '\0';
-	for(i = 7; i >= 0; i--){
-		dec[i] = (d%10)+48;
+	unsigned int c = 0;
+	unsigned int t = d;
+	int j;
+	do{
+		c += 1;
+		t /= 10;
+	}while(t > 0);
+	char dec[c+1];
+	dec[c] = '\0';
+	for(j = c-1; j >=0; j--){
+		dec[j] = (d%10)+48;
 		d /= 10;
 	}
 	uart_send_string(dec);

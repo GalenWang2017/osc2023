@@ -60,10 +60,8 @@ int strlen(const char *str)
     return ret;
 }
 
-int strcpy(char *dst, const char *src)
-{
+int strcpy(char *dst, const char *src){
     int ret = 0;
-
     while (*src) {
         *dst = *src;
         dst++;
@@ -143,4 +141,23 @@ int atoi(const char *str)
     }
 
     return i;
+}
+
+int htoi(const char *str){
+    /*
+        hex string convert to decimal int (positive only)
+    */
+    int rlt = 0;
+    while(*str){
+        if(*str >= 'A' && *str <= 'F'){
+            rlt = rlt + (*str - 'A' + 10);
+        }else if(*str >= '0' && *str <= '9'){
+            rlt = rlt + (*str - '0');
+        }else if(*str >= 'a' && *str <= 'a'){
+            rlt = rlt + (*str - 'a' + 10);
+        }
+        rlt = rlt << 4;
+        str++;
+    }
+    return rlt >> 4;
 }

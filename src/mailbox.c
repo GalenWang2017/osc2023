@@ -53,7 +53,7 @@ void get_board_revision(void){
     // it should be 0xa020d3 for rpi3 b+
     uart_send_string(". Board revision: ");
     uart_hex(mbox[5]);
-    uart_send_string("\n");
+    uart_send_string("\r\n");
 }
 
 void get_arm_memory(void){
@@ -70,9 +70,9 @@ void get_arm_memory(void){
 
     mailbox_call(MBOX_CH_PROP); // message passing procedure call, you should implement it following the 6 steps provided above.
 
-    uart_send_string(". ARM memory base address: ");
+    uart_send_string(". ARM memory base address: 0x");
     uart_hex(mbox[5]);
-    uart_send_string("\n. ARM memory size: ");
+    uart_send_string("\r\n. ARM memory size: ");
     uart_dec(mbox[6]);
-    uart_send_string(" bytes\n");
+    uart_send_string(" bytes\r\n");
 }

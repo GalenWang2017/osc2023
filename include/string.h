@@ -10,5 +10,6 @@ char *strcat(char *dest, const char *src);
 char *strncat(char *dest, const char *src, int n);
 
 int atoi(const char *str);
+int htoi(const char *str);
 
 #endif  /* _STRING_H */
