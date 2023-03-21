@@ -2,12 +2,9 @@
 #include "string.h"
 #include "mailbox.h"
 #include "reboot.h"
-#include "cpio.h"
-
 #define BUFF_SIZE 1000
 
 char readBuf[BUFF_SIZE];
-char *curFileAddr;
 
 void shell(){
 	int count = 0;
@@ -17,7 +14,7 @@ void shell(){
 			uart_send_string("\r\n");
 			readBuf[count] = '\0';
 			if(!strcmp(readBuf, "help")){
-				uart_send_string(". help\t: print help menu.\r\n. hello\t: print \"Hello World!\".\r\n. info\t: print the hardware's information.\r\n. ls\t: list files.\r\n. cat\t: show the file's content.\r\n. reboot: reboot the device.\r\n");
+				uart_send_string(". help\t: print help menu.\r\n. hello\t: print \"Hello World!\".\r\n. info\t: print the hardware's information.\r\n. reboot: reboot the device.\r\n. load\t: load kernel\r\n");
 			}else if(!strcmp(readBuf, "hello")){
 				uart_send_string("Hello World!\r\n");
 			}else if(!strcmp(readBuf, "info")){
@@ -27,11 +24,24 @@ void shell(){
 			}else if(!strcmp(readBuf, "reboot")){
 				uart_send_string("Reboot the device.\r\n");
 				reset(50);
-			}else if(!strcmp(readBuf, "ls")){
-				ls(curFileAddr);
-			}else if(!memcmp(readBuf, "cat ", 4)){
-				cat(curFileAddr, readBuf+4);
-			}else{
+			}else if(!strcmp(readBuf, "load")){
+                uart_send_string("load kernel...\r\n");
+				unsigned int size = 0;
+				char *k = (char *)0x80000;
+				size = uart_recv();
+				size |= (uart_recv()<<8);
+				size |= (uart_recv()<<16);
+				size |= (uart_recv()<<24);
+				uart_send_string("Size of kernel: ");
+				uart_dec(size);
+				uart_send_string("\r\nStart to load kernel\r\n");
+				while(size--){
+					*k++ = uart_recv();
+				}
+				uart_send_string("Finish loading kernel\r\nBooting...\r\n");
+				asm volatile("ldr x30, =_kernel");
+				asm volatile("br x30;");
+            }else{
 				uart_send_string("Command not found: ");
 				uart_send_string(readBuf);
 				uart_send_string("\r\n");
@@ -48,11 +58,10 @@ void shell(){
 	}
 }
 
-void kernel_main(void)
+void bootloader(void)
 {	
 	uart_init();
-	curFileAddr = ramfs_init();
-	uart_send_string("Hello!!!\r\n# ");
+	uart_send_string("\r\nBootloader...\r\n# ");
 
 	shell();
 }
